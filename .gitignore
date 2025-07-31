@@ -1,0 +1,24 @@
+# .gitignore 내용 시작
+# 가상환경, 캐시, IDE 파일
+.venv/
+__pycache__/
+.vscode/
+.env
+*.log
+*.csv
+*.json
+*.pyc
+
+# 모델 및 데이터
+models/
+data/
+reports/
+*.tar
+*.zip
+
+# 기타 백테스트 결과
+backtest_*
+*_result.*
+trade_*
+report*.py
+# .gitignore 내용 끝

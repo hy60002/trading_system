@@ -1,0 +1,335 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitget Trading Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-2">Bitget Trading System</h1>
+            <p class="text-gray-400">Advanced Auto Trading Dashboard</p>
+        </div>
+        
+        <!-- System Status -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-sm text-gray-400 mb-2">System Status</h3>
+                <div class="flex items-center">
+                    <div class="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                    <span class="text-xl font-semibold" id="systemStatus">Running</span>
+                </div>
+            </div>
+            
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-sm text-gray-400 mb-2">USDT Balance</h3>
+                <p class="text-2xl font-bold" id="balance">$0.00</p>
+            </div>
+            
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-sm text-gray-400 mb-2">Open Positions</h3>
+                <p class="text-2xl font-bold" id="openPositions">0</p>
+            </div>
+            
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-sm text-gray-400 mb-2">Today's P&L</h3>
+                <p class="text-2xl font-bold" id="todayPnl">$0.00</p>
+            </div>
+        </div>
+        
+        <!-- Portfolio Allocation -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-lg font-semibold mb-4">Portfolio Allocation</h3>
+                <canvas id="portfolioChart"></canvas>
+            </div>
+            
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="text-lg font-semibold mb-4">Performance Chart</h3>
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Positions Table -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-8">
+            <h3 class="text-lg font-semibold mb-4">Open Positions</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-700">
+                            <th class="text-left py-3 px-4">Symbol</th>
+                            <th class="text-left py-3 px-4">Side</th>
+                            <th class="text-right py-3 px-4">Entry Price</th>
+                            <th class="text-right py-3 px-4">Current Price</th>
+                            <th class="text-right py-3 px-4">Quantity</th>
+                            <th class="text-right py-3 px-4">P&L</th>
+                            <th class="text-right py-3 px-4">P&L %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="positionsTable">
+                        <tr>
+                            <td colspan="7" class="text-center py-8 text-gray-500">No open positions</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Recent Trades -->
+        <div class="bg-gray-800 rounded-lg p-6">
+            <h3 class="text-lg font-semibold mb-4">Recent Trades</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-700">
+                            <th class="text-left py-3 px-4">Time</th>
+                            <th class="text-left py-3 px-4">Symbol</th>
+                            <th class="text-left py-3 px-4">Side</th>
+                            <th class="text-right py-3 px-4">Price</th>
+                            <th class="text-right py-3 px-4">Quantity</th>
+                            <th class="text-right py-3 px-4">P&L</th>
+                            <th class="text-left py-3 px-4">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tradesTable">
+                        <tr>
+                            <td colspan="7" class="text-center py-8 text-gray-500">No recent trades</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // WebSocket connection
+        let ws = null;
+        
+        // Charts
+        let portfolioChart = null;
+        let performanceChart = null;
+        
+        // Initialize charts
+        function initCharts() {
+            // Portfolio allocation chart
+            const portfolioCtx = document.getElementById('portfolioChart').getContext('2d');
+            portfolioChart = new Chart(portfolioCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['BTC (70%)', 'ETH (20%)', 'XRP (10%)'],
+                    datasets: [{
+                        data: [70, 20, 10],
+                        backgroundColor: ['#f7931a', '#627eea', '#00aae4']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#e5e7eb' }
+                        }
+                    }
+                }
+            });
+            
+            // Performance chart
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            performanceChart = new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Equity Curve',
+                        data: [],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#e5e7eb' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#9ca3af' },
+                            grid: { color: '#374151' }
+                        },
+                        y: {
+                            ticks: { color: '#9ca3af' },
+                            grid: { color: '#374151' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Connect to WebSocket
+        function connectWebSocket() {
+            ws = new WebSocket('ws://localhost:8000/ws');
+            
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                updateStatus();
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                updateDashboard(data);
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket disconnected');
+                setTimeout(connectWebSocket, 5000);
+            };
+            
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+        }
+        
+        // Update dashboard with new data
+        function updateDashboard(data) {
+            if (data.positions) {
+                updatePositionsTable(data.positions);
+            }
+        }
+        
+        // Update system status
+        async function updateStatus() {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                
+                document.getElementById('systemStatus').textContent = data.status;
+                document.getElementById('balance').textContent = `$${data.balance.toFixed(2)}`;
+                document.getElementById('openPositions').textContent = data.open_positions;
+                
+            } catch (error) {
+                console.error('Error updating status:', error);
+            }
+        }
+        
+        // Update positions table
+        function updatePositionsTable(positions) {
+            const tbody = document.getElementById('positionsTable');
+            
+            if (positions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500">No open positions</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = positions.map(pos => {
+                const pnl = ((pos.current_price - pos.entry_price) / pos.entry_price * 100).toFixed(2);
+                const pnlClass = pnl >= 0 ? 'positive' : 'negative';
+                
+                return `
+                    <tr class="border-b border-gray-700">
+                        <td class="py-3 px-4">${pos.symbol}</td>
+                        <td class="py-3 px-4">${pos.side}</td>
+                        <td class="text-right py-3 px-4">$${pos.entry_price.toFixed(2)}</td>
+                        <td class="text-right py-3 px-4">$${pos.current_price.toFixed(2)}</td>
+                        <td class="text-right py-3 px-4">${pos.quantity}</td>
+                        <td class="text-right py-3 px-4 ${pnlClass}">$${(pnl * pos.quantity * pos.entry_price / 100).toFixed(2)}</td>
+                        <td class="text-right py-3 px-4 ${pnlClass}">${pnl}%</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // Load recent trades
+        async function loadRecentTrades() {
+            try {
+                const response = await fetch('/trades?limit=10');
+                const trades = await response.json();
+                
+                const tbody = document.getElementById('tradesTable');
+                
+                if (trades.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500">No recent trades</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = trades.map(trade => {
+                    const pnlClass = trade.pnl >= 0 ? 'positive' : 'negative';
+                    const statusClass = trade.status === 'closed' ? 'text-gray-400' : 'text-green-400';
+                    
+                    return `
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 px-4">${new Date(trade.timestamp).toLocaleString()}</td>
+                            <td class="py-3 px-4">${trade.symbol}</td>
+                            <td class="py-3 px-4">${trade.side}</td>
+                            <td class="text-right py-3 px-4">$${trade.price.toFixed(2)}</td>
+                            <td class="text-right py-3 px-4">${trade.quantity}</td>
+                            <td class="text-right py-3 px-4 ${pnlClass}">${trade.pnl ? `$${trade.pnl.toFixed(2)}` : '-'}</td>
+                            <td class="py-3 px-4 ${statusClass}">${trade.status}</td>
+                        </tr>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading trades:', error);
+            }
+        }
+        
+        // Load performance data
+        async function loadPerformance() {
+            try {
+                const response = await fetch('/performance?days=7');
+                const data = await response.json();
+                
+                // Update today's P&L
+                document.getElementById('todayPnl').textContent = `$${data.today_pnl.toFixed(2)}`;
+                document.getElementById('todayPnl').className = data.today_pnl >= 0 ? 'text-2xl font-bold positive' : 'text-2xl font-bold negative';
+                
+                // Update performance chart
+                if (data.history && performanceChart) {
+                    const labels = data.history.map(d => d.date);
+                    const values = data.history.map(d => d.total_pnl);
+                    
+                    performanceChart.data.labels = labels;
+                    performanceChart.data.datasets[0].data = values;
+                    performanceChart.update();
+                }
+                
+            } catch (error) {
+                console.error('Error loading performance:', error);
+            }
+        }
+        
+        // Initialize dashboard
+        window.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            connectWebSocket();
+            updateStatus();
+            loadRecentTrades();
+            loadPerformance();
+            
+            // Refresh data periodically
+            setInterval(updateStatus, 5000);
+            setInterval(loadRecentTrades, 10000);
+            setInterval(loadPerformance, 60000);
+        });
+    </script>
+</body>
+</html>
