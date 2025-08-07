@@ -1,0 +1,532 @@
+/* CSS 변수 정의 */
+:root {
+    --primary-color-rgb: 100, 149, 237;
+}
+
+/* 검색/필터링 시스템 스타일 */
+.search-filter-manager {
+    background: var(--card-background);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-light);
+    border: 1px solid var(--border-color);
+}
+
+/* 검색 컨테이너 */
+.search-container {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.search-input-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    background: var(--input-background);
+    color: var(--text-color);
+    transition: all 0.2s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
+}
+
+.search-clear {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 50%;
+    display: none;
+    transition: all 0.2s ease;
+}
+
+.search-clear:hover {
+    background: var(--hover-color);
+    color: var(--text-color);
+}
+
+.search-clear svg {
+    display: block;
+    fill: currentColor;
+}
+
+/* 검색 제안 */
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    box-shadow: var(--shadow-medium);
+    z-index: 1000;
+    display: none;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.suggestion-item {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover,
+.suggestion-item[aria-selected="true"] {
+    background: var(--hover-color);
+    color: var(--primary-color);
+}
+
+/* 필터 토글 버튼 */
+.filter-toggle {
+    padding: 0.75rem;
+    background: var(--secondary-color);
+    border: none;
+    border-radius: var(--border-radius);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.filter-toggle:hover {
+    background: var(--secondary-color-dark);
+    transform: translateY(-1px);
+}
+
+.filter-toggle svg {
+    transition: transform 0.3s ease;
+}
+
+/* 필터 패널 */
+.filter-panel {
+    background: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: none;
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.filter-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-preset,
+.filter-clear {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--card-background);
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.filter-preset:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.filter-clear {
+    background: var(--danger-color);
+    color: white;
+    border-color: var(--danger-color);
+}
+
+.filter-clear:hover {
+    background: var(--danger-color-dark);
+}
+
+/* 필터 컨트롤 */
+.filter-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+}
+
+.filter-select {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--input-background);
+    color: var(--text-color);
+    font-size: 0.875rem;
+}
+
+.filter-select[multiple] {
+    min-height: 80px;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* 범위 필터 */
+.range-filter,
+.date-range-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.range-min,
+.range-max,
+.date-start,
+.date-end {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--input-background);
+    color: var(--text-color);
+    font-size: 0.875rem;
+}
+
+.range-separator,
+.date-separator {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* 활성 필터 태그 */
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    min-height: 1rem;
+}
+
+.filter-tag {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.filter-tag .filter-label {
+    margin: 0;
+    font-weight: 600;
+}
+
+.filter-tag .filter-value {
+    font-weight: normal;
+}
+
+.filter-remove {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.125rem;
+    border-radius: 50%;
+    margin-left: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.filter-remove:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.filter-remove svg {
+    display: block;
+    fill: currentColor;
+}
+
+/* 검색 결과 */
+.search-results {
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.results-count {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.results-sort {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.results-sort label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.sort-select {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--input-background);
+    color: var(--text-color);
+    font-size: 0.875rem;
+}
+
+/* 검색 결과 아이템 */
+.results-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.search-result-item {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.search-result-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-light);
+    transform: translateY(-1px);
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.result-symbol {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.result-side {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.result-side.long {
+    background: var(--success-color);
+    color: white;
+}
+
+.result-side.short {
+    background: var(--danger-color);
+    color: white;
+}
+
+.result-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.result-pnl {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.result-pnl.positive {
+    color: var(--success-color);
+}
+
+.result-pnl.negative {
+    color: var(--danger-color);
+}
+
+.result-volume {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.result-notes {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* 검색어 하이라이트 */
+.search-highlight {
+    background: var(--warning-color);
+    color: var(--text-color);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+}
+
+/* 결과 없음 */
+.no-results {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+}
+
+.no-results p {
+    margin: 0 0 0.5rem 0;
+}
+
+.no-results p:last-child {
+    margin-bottom: 0;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .search-container {
+        flex-direction: column;
+    }
+    
+    .filter-controls {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .results-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: stretch;
+    }
+    
+    .result-header,
+    .result-details {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.25rem;
+    }
+    
+    .active-filters {
+        justify-content: center;
+    }
+}
+
+/* 다크 모드 대응 */
+@media (prefers-color-scheme: dark) {
+    .search-suggestions {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    .search-highlight {
+        background: #ffd60a;
+        color: #000;
+    }
+}
+
+/* 접근성 개선 */
+.search-filter-manager:focus-within {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* 로딩 상태 */
+.search-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: var(--text-muted);
+}
+
+.search-loading::after {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-top: 2px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 0.5rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

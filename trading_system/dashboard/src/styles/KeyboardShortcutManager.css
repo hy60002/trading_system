@@ -1,0 +1,517 @@
+/* 키보드 단축키 매니저 스타일 */
+
+/* 모달 공통 스타일 */
+.shortcut-help-modal,
+.shortcut-settings-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    font-family: var(--font-family);
+}
+
+.modal-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    padding: 1rem;
+}
+
+.modal-content {
+    background: var(--card-background);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-modal);
+    border: 1px solid var(--border-color);
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--background-secondary);
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-header h2 i {
+    color: var(--primary-color);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: var(--border-radius);
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: var(--hover-color);
+    color: var(--text-color);
+}
+
+.modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    background: var(--background-secondary);
+    border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+}
+
+/* 버튼 스타일 */
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    border: 1px solid;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-color-dark);
+    border-color: var(--primary-color-dark);
+}
+
+.btn-secondary {
+    background: var(--card-background);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.btn-secondary:hover {
+    background: var(--hover-color);
+    border-color: var(--primary-color);
+}
+
+.btn-danger {
+    background: var(--danger-color);
+    border-color: var(--danger-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: var(--danger-color-dark);
+    border-color: var(--danger-color-dark);
+}
+
+/* 도움말 모달 스타일 */
+.shortcut-search {
+    margin-bottom: 1.5rem;
+}
+
+.shortcut-search-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    background: var(--input-background);
+    color: var(--text-color);
+    transition: all 0.2s ease;
+}
+
+.shortcut-search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
+}
+
+.shortcut-categories {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.shortcut-section {
+    background: var(--background-secondary);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+}
+
+.shortcut-section h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.shortcut-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.shortcut-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid transparent;
+}
+
+.shortcut-item:last-child {
+    border-bottom: none;
+}
+
+.shortcut-key {
+    background: var(--code-background);
+    color: var(--code-color);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--border-radius-sm);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+    min-width: 100px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.shortcut-description {
+    flex: 1;
+    margin-left: 1rem;
+    color: var(--text-color);
+    font-size: 0.875rem;
+}
+
+/* 설정 모달 스타일 */
+.settings-tabs {
+    display: flex;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    color: var(--text-color);
+    background: var(--hover-color);
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    background: var(--hover-color);
+}
+
+.settings-content {
+    min-height: 300px;
+}
+
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+/* 단축키 에디터 */
+.shortcut-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.shortcut-editor-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--background-secondary);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+}
+
+.shortcut-editor-key {
+    min-width: 120px;
+}
+
+.shortcut-editor-description {
+    flex: 1;
+}
+
+.shortcut-editor-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.shortcut-editor-input {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--input-background);
+    color: var(--text-color);
+    font-size: 0.875rem;
+}
+
+.shortcut-editor-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* 가져오기/내보내기 */
+.import-export-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    padding: 2rem;
+    text-align: center;
+}
+
+.import-export-controls p {
+    color: var(--text-muted);
+    margin: 0 0 1rem 0;
+}
+
+/* 초기화 */
+.reset-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    padding: 2rem;
+    text-align: center;
+}
+
+.reset-controls p {
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* 키 입력 캡처 오버레이 */
+.key-capture-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+}
+
+.key-capture-dialog {
+    background: var(--card-background);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-modal);
+}
+
+.key-capture-dialog h3 {
+    margin: 0 0 1rem 0;
+    color: var(--text-color);
+}
+
+.key-capture-dialog p {
+    margin: 0 0 1.5rem 0;
+    color: var(--text-muted);
+}
+
+.captured-key {
+    background: var(--code-background);
+    color: var(--code-color);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    font-family: var(--font-mono);
+    font-weight: 600;
+    border: 2px solid var(--primary-color);
+    display: inline-block;
+    min-width: 100px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .modal-content {
+        margin: 0.5rem;
+        max-height: calc(100vh - 1rem);
+    }
+    
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding: 1rem;
+    }
+    
+    .shortcut-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .shortcut-key {
+        min-width: auto;
+        align-self: flex-start;
+    }
+    
+    .shortcut-description {
+        margin-left: 0;
+    }
+    
+    .settings-tabs {
+        flex-direction: column;
+    }
+    
+    .tab-btn {
+        text-align: left;
+        border-bottom: none;
+        border-left: 2px solid transparent;
+    }
+    
+    .tab-btn.active {
+        border-left-color: var(--primary-color);
+        border-bottom-color: transparent;
+    }
+    
+    .shortcut-editor-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* 다크 모드 대응 */
+@media (prefers-color-scheme: dark) {
+    .modal-overlay {
+        background: rgba(0, 0, 0, 0.8);
+    }
+    
+    .shortcut-key {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* 고대비 모드 */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border-width: 2px;
+    }
+    
+    .shortcut-key {
+        border-width: 2px;
+        font-weight: 700;
+    }
+    
+    .tab-btn.active {
+        border-bottom-width: 3px;
+    }
+}
+
+/* 애니메이션 감소 모드 */
+@media (prefers-reduced-motion: reduce) {
+    .modal-content {
+        animation: none;
+    }
+    
+    * {
+        transition: none !important;
+    }
+}
+
+/* 포커스 표시 개선 */
+.modal-content:focus-within {
+    outline: 2px solid var(--primary-color);
+    outline-offset: -2px;
+}
+
+.shortcut-item:focus-within {
+    background: var(--hover-color);
+    border-radius: var(--border-radius);
+}
+
+/* 스크롤바 스타일링 */
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: var(--background-secondary);
+    border-radius: var(--border-radius);
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* 글로벌 모달 클래스 */
+.modal-open {
+    overflow: hidden;
+}
