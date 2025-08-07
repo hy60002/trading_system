@@ -21,4 +21,8 @@ backtest_*
 *_result.*
 trade_*
 report*.py
+
+# 오류 방지 추가 항목
+nul
+mcp-shrimp-task-manager/
 # .gitignore 내용 끝

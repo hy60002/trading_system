@@ -1,0 +1,98 @@
+/* 🌙 Dark Theme (Default) */
+[data-theme="dark"] {
+  --bg-primary: #0F0F23;
+  --bg-secondary: #1A1A2E;
+  --bg-card: rgba(255, 255, 255, 0.05);
+  --bg-gradient: linear-gradient(135deg, #1E1E2E 0%, #2D2D44 100%);
+  
+  --text-primary: #FFFFFF;
+  --text-secondary: #B0B0B0;
+  --text-muted: #6B7280;
+  
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ☀️ Light Theme */
+[data-theme="light"] {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F8FAFC;
+  --bg-card: rgba(0, 0, 0, 0.02);
+  --bg-gradient: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%);
+  
+  --text-primary: #1E293B;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  
+  --border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Light Theme Adjustments */
+[data-theme="light"] .header {
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid var(--border-color);
+}
+
+[data-theme="light"] .summary-card {
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .positions-table th {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .positions-table tbody tr:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="light"] .widget {
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .theme-toggle {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="light"] .filter-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="light"] .action-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+}
+
+/* High Contrast Theme */
+[data-theme="high-contrast"] {
+  --bg-primary: #000000;
+  --bg-secondary: #1A1A1A;
+  --bg-card: rgba(255, 255, 255, 0.1);
+  --bg-gradient: linear-gradient(135deg, #000000 0%, #1A1A1A 100%);
+  
+  --text-primary: #FFFFFF;
+  --text-secondary: #E5E5E5;
+  --text-muted: #CCCCCC;
+  
+  --border-color: rgba(255, 255, 255, 0.3);
+  
+  --profit-green: #00FF7F;
+  --loss-red: #FF3366;
+  --active-blue: #00BFFF;
+  --warning-orange: #FFD700;
+}
+
+[data-theme="high-contrast"] .summary-card {
+  border: 2px solid var(--border-color);
+}
+
+[data-theme="high-contrast"] .widget {
+  border: 2px solid var(--border-color);
+}
+
+/* Theme Transition */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}

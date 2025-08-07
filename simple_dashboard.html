@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Bitget Trading System v3.0 - 간단 대시보드</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a; color: #ffffff; padding: 20px;
+        }
+        .header { 
+            background: #1a1a1a; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;
+            border-left: 4px solid #00d4aa;
+        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+        .card { 
+            background: #1a1a1a; padding: 1rem; border-radius: 8px; 
+            border: 1px solid #333; position: relative;
+        }
+        .card h3 { color: #00d4aa; margin-bottom: 1rem; }
+        .status { 
+            display: inline-block; padding: 4px 12px; border-radius: 20px; 
+            font-size: 0.875rem; margin-bottom: 0.5rem;
+        }
+        .status.running { background: #00d4aa; color: #000; }
+        .status.error { background: #ff4444; color: #fff; }
+        .loading { color: #888; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #333; }
+        th { color: #00d4aa; }
+        .refresh-btn { 
+            background: #00d4aa; color: #000; border: none; padding: 8px 16px; 
+            border-radius: 4px; cursor: pointer; margin-bottom: 1rem;
+        }
+        .refresh-btn:hover { background: #00b090; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 Bitget Trading System v3.0</h1>
+        <p>실시간 거래 모니터링 대시보드</p>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h3>시스템 상태</h3>
+            <div id="system-status" class="loading">로딩 중...</div>
+            <button class="refresh-btn" onclick="refreshData()">새로고침</button>
+        </div>
+
+        <div class="card">
+            <h3>현재 포지션</h3>
+            <div id="positions-data" class="loading">로딩 중...</div>
+        </div>
+
+        <div class="card">
+            <h3>잔고 정보</h3>
+            <div id="balance-data" class="loading">로딩 중...</div>
+        </div>
+
+        <div class="card">
+            <h3>최근 거래</h3>
+            <div id="trades-data" class="loading">로딩 중...</div>
+        </div>
+    </div>
+
+    <script>
+        let refreshInterval;
+
+        async function fetchData(endpoint) {
+            try {
+                const response = await fetch(`/api/${endpoint}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                console.error(`${endpoint} 데이터 로드 실패:`, error);
+                return { error: error.message };
+            }
+        }
+
+        async function refreshData() {
+            console.log('데이터 새로고침...');
+
+            // 시스템 상태
+            const statusEl = document.getElementById('system-status');
+            try {
+                const status = await fetchData('dashboard');
+                if (status.error) {
+                    statusEl.innerHTML = `<div class="status error">오류: ${status.error}</div>`;
+                } else {
+                    const wsStatus = status.system_status?.websocket_connected ? '연결됨' : '연결 끊김';
+                    statusEl.innerHTML = `
+                        <div class="status running">시스템 가동 중</div>
+                        <p>WebSocket: ${wsStatus}</p>
+                        <p>마지막 업데이트: ${new Date().toLocaleTimeString()}</p>
+                    `;
+                }
+            } catch (error) {
+                statusEl.innerHTML = `<div class="status error">시스템 상태 조회 실패</div>`;
+            }
+
+            // 포지션 정보
+            const positionsEl = document.getElementById('positions-data');
+            try {
+                const positions = await fetchData('dashboard');
+                if (positions.positions && positions.positions.length > 0) {
+                    let html = '<table><tr><th>종목</th><th>방향</th><th>수량</th><th>손익</th></tr>';
+                    positions.positions.forEach(pos => {
+                        const pnl = pos.unrealized_pnl || 0;
+                        const pnlColor = pnl >= 0 ? '#00d4aa' : '#ff4444';
+                        html += `<tr>
+                            <td>${pos.symbol}</td>
+                            <td>${pos.side}</td>
+                            <td>${pos.quantity}</td>
+                            <td style="color: ${pnlColor}">${pnl.toFixed(2)}%</td>
+                        </tr>`;
+                    });
+                    html += '</table>';
+                    positionsEl.innerHTML = html;
+                } else {
+                    positionsEl.innerHTML = '<p>활성 포지션 없음</p>';
+                }
+            } catch (error) {
+                positionsEl.innerHTML = '<p>포지션 데이터 로드 실패</p>';
+            }
+
+            // 잔고 정보
+            const balanceEl = document.getElementById('balance-data');
+            try {
+                const balance = await fetchData('balance');
+                if (balance.error) {
+                    balanceEl.innerHTML = `<p>잔고 조회 실패: ${balance.error}</p>`;
+                } else {
+                    balanceEl.innerHTML = `
+                        <p>총 잔고: $${balance.total_balance?.toFixed(2) || '0.00'}</p>
+                        <p>가용 잔고: $${balance.free_balance?.toFixed(2) || '0.00'}</p>
+                        <p>사용 중: $${balance.used_balance?.toFixed(2) || '0.00'}</p>
+                        <p>포지션 수: ${balance.open_positions || 0}개</p>
+                    `;
+                }
+            } catch (error) {
+                balanceEl.innerHTML = '<p>잔고 데이터 로드 실패</p>';
+            }
+
+            // 최근 거래
+            const tradesEl = document.getElementById('trades-data');
+            try {
+                const trades = await fetchData('dashboard');
+                if (trades.recent_trades && trades.recent_trades.length > 0) {
+                    let html = '<table><tr><th>시간</th><th>종목</th><th>방향</th><th>손익</th></tr>';
+                    trades.recent_trades.slice(0, 5).forEach(trade => {
+                        const time = new Date(trade.timestamp).toLocaleTimeString();
+                        const pnl = trade.pnl || 0;
+                        const pnlColor = pnl >= 0 ? '#00d4aa' : '#ff4444';
+                        html += `<tr>
+                            <td>${time}</td>
+                            <td>${trade.symbol}</td>
+                            <td>${trade.side}</td>
+                            <td style="color: ${pnlColor}">${pnl.toFixed(2)}%</td>
+                        </tr>`;
+                    });
+                    html += '</table>';
+                    tradesEl.innerHTML = html;
+                } else {
+                    tradesEl.innerHTML = '<p>최근 거래 없음</p>';
+                }
+            } catch (error) {
+                tradesEl.innerHTML = '<p>거래 데이터 로드 실패</p>';
+            }
+        }
+
+        // 페이지 로드 시 데이터 로드
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 간단 대시보드 시작');
+            refreshData();
+            
+            // 30초마다 자동 새로고침
+            refreshInterval = setInterval(refreshData, 30000);
+        });
+
+        // 페이지 언로드 시 인터벌 정리
+        window.addEventListener('beforeunload', () => {
+            if (refreshInterval) clearInterval(refreshInterval);
+        });
+    </script>
+</body>
+</html>

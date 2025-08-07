@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Bitget Trading System v3.0 - 대시보드</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/dashboard/css/main.css">
+    <link rel="stylesheet" href="/dashboard/css/themes.css">
+    <link rel="stylesheet" href="/dashboard/css/telegram-notifications.css">
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-title">
+                <i class="fas fa-rocket"></i>
+                Bitget Trading System v3.0
+            </div>
+            
+            <div class="header-controls">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span id="system-status">실행 중</span>
+                </div>
+                
+                <div class="status-indicator">
+                    <i class="fas fa-wifi"></i>
+                    <span id="websocket-status">연결됨</span>
+                </div>
+                
+                <div class="status-indicator">
+                    <i class="fas fa-clock"></i>
+                    <span id="last-update">-</span>
+                </div>
+                
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                    <span id="theme-text">다크</span>
+                </button>
+                
+                <button class="theme-toggle" onclick="refreshData()">
+                    <i class="fas fa-sync-alt" id="refresh-icon"></i>
+                    새로고침
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <div class="container">
+        <!-- 최상단 요약 섹션 -->
+        <div class="summary-grid">
+            <div class="summary-card" id="total-balance-card">
+                <div class="summary-label">총 자산</div>
+                <div class="summary-value" id="total-balance">$0</div>
+                <div class="summary-change" id="balance-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+0%</span>
+                </div>
+            </div>
+            
+            <div class="summary-card" id="daily-pnl-card">
+                <div class="summary-label">오늘 손익</div>
+                <div class="summary-value" id="daily-pnl">$0</div>
+                <div class="summary-change" id="daily-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+0%</span>
+                </div>
+            </div>
+            
+            <div class="summary-card" id="realized-pnl-card">
+                <div class="summary-label">실현 손익</div>
+                <div class="summary-value" id="realized-pnl">$0</div>
+                <div class="summary-change" id="realized-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+0%</span>
+                </div>
+            </div>
+            
+            <div class="summary-card" id="unrealized-pnl-card">
+                <div class="summary-label">미실현 손익</div>
+                <div class="summary-value" id="unrealized-pnl">$0</div>
+                <div class="summary-change" id="unrealized-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 자본 추적 섹션 -->
+        <div class="capital-tracking-section">
+            <div id="capital-tracker-container"></div>
+        </div>
+
+        <!-- 메인 대시보드 그리드 -->
+        <div class="dashboard-grid">
+            <!-- 포지션 섹션 -->
+            <div class="positions-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-chart-line"></i>
+                        활성 포지션
+                        <span class="badge" id="positions-count">0</span>
+                    </div>
+                    
+                    <div class="filters">
+                        <button class="filter-btn active" data-filter="all">전체</button>
+                        <button class="filter-btn" data-filter="BTC">BTC</button>
+                        <button class="filter-btn" data-filter="ETH">ETH</button>
+                        
+                        <select id="sort-select" class="filter-btn" style="padding: 0.375rem 0.75rem;">
+                            <option value="symbol">종목순</option>
+                            <option value="pnl">손익순</option>
+                            <option value="size">크기순</option>
+                            <option value="time">시간순</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="positions-table">
+                        <thead>
+                            <tr>
+                                <th>종목</th>
+                                <th>방향</th>
+                                <th>크기</th>
+                                <th>진입가</th>
+                                <th>현재가</th>
+                                <th>손익률</th>
+                                <th>손익 ($)</th>
+                                <th>액션</th>
+                            </tr>
+                        </thead>
+                        <tbody id="positions-tbody">
+                            <tr>
+                                <td colspan="8" class="text-center" style="color: var(--text-muted); padding: 2rem;">
+                                    <i class="fas fa-chart-line" style="font-size: 2rem; opacity: 0.3; margin-bottom: 1rem; display: block;"></i>
+                                    활성 포지션이 없습니다
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 위젯 섹션 -->
+            <div class="widgets-section">
+                <!-- 리스크 미터 -->
+                <div class="widget">
+                    <div class="widget-title">
+                        <i class="fas fa-tachometer-alt"></i>
+                        리스크 미터
+                    </div>
+                    <div class="risk-meter">
+                        <svg width="120" height="60" viewBox="0 0 120 60">
+                            <defs>
+                                <linearGradient id="riskGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:var(--profit-green)"/>
+                                    <stop offset="50%" style="stop-color:var(--warning-orange)"/>
+                                    <stop offset="100%" style="stop-color:var(--loss-red)"/>
+                                </linearGradient>
+                            </defs>
+                            <path class="risk-arc" d="M 20 50 A 40 40 0 0 1 100 50" stroke="var(--border-color)" stroke-width="8"/>
+                            <path class="risk-arc active" id="risk-arc-active" d="M 20 50 A 40 40 0 0 1 60 20" stroke="url(#riskGradient)" stroke-width="8"/>
+                        </svg>
+                    </div>
+                    <div class="risk-value" id="risk-percentage">25%</div>
+                    <div class="text-center" style="color: var(--text-muted); font-size: 0.875rem;">현재 위험도</div>
+                </div>
+
+                <!-- 손익 스파크라인 -->
+                <div class="widget">
+                    <div class="widget-title">
+                        <i class="fas fa-chart-area"></i>
+                        24시간 손익 추이
+                    </div>
+                    <div class="sparkline-container">
+                        <svg class="sparkline" id="pnl-sparkline" viewBox="0 0 300 60">
+                            <defs>
+                                <linearGradient id="sparklineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:var(--profit-green);stop-opacity:0.3"/>
+                                    <stop offset="100%" style="stop-color:var(--profit-green);stop-opacity:0"/>
+                                </linearGradient>
+                            </defs>
+                            <path class="sparkline-area" d="M0,60 L0,30 L75,25 L150,20 L225,35 L300,15 L300,60 Z"/>
+                            <path class="sparkline-path" d="M0,30 L75,25 L150,20 L225,35 L300,15"/>
+                        </svg>
+                    </div>
+                    <div class="text-center">
+                        <span style="color: var(--profit-green); font-weight: 600;" id="sparkline-change">+2.5%</span>
+                        <span style="color: var(--text-muted); margin-left: 0.5rem;">지난 24시간</span>
+                    </div>
+                </div>
+
+                <!-- 빠른 통계 -->
+                <div class="widget">
+                    <div class="widget-title">
+                        <i class="fas fa-chart-pie"></i>
+                        빠른 통계
+                    </div>
+                    <div class="quick-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="win-rate">0%</div>
+                            <div class="stat-label">승률</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="avg-win">$0</div>
+                            <div class="stat-label">평균 수익</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="avg-loss">$0</div>
+                            <div class="stat-label">평균 손실</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-trades">0</div>
+                            <div class="stat-label">총 거래</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI 신뢰도 -->
+                <div class="widget">
+                    <div class="widget-title">
+                        <i class="fas fa-brain"></i>
+                        AI 예측 신뢰도
+                    </div>
+                    <div class="ai-confidence">
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" id="confidence-fill" style="width: 75%;"></div>
+                        </div>
+                        <div class="confidence-value" id="confidence-value">75%</div>
+                    </div>
+                    <div class="text-center mt-2" style="color: var(--text-muted); font-size: 0.875rem;">
+                        현재 예측 모델 신뢰도
+                    </div>
+                </div>
+
+                <!-- 텔레그램 알림 통합 위젯 -->
+                <div class="widget" id="telegram-widget-container">
+                    <!-- 텔레그램 알림 위젯이 여기에 로드됩니다 -->
+                </div>
+
+                <!-- 시장 상태 -->
+                <div class="widget">
+                    <div class="widget-title">
+                        <i class="fas fa-chart-bar"></i>
+                        시장 상태
+                    </div>
+                    <div class="text-center">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">
+                            <span id="market-volatility">보통</span>
+                        </div>
+                        <div style="color: var(--text-muted); font-size: 0.875rem;">
+                            변동성: <span id="volatility-level">중간</span>
+                        </div>
+                        <div style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">
+                            추세: <span id="market-trend">횡보</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 최근 거래 섹션 -->
+        <div class="positions-section" style="margin-top: 2rem;">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-history"></i>
+                    최근 거래
+                </div>
+                <div>
+                    <button class="filter-btn" onclick="exportTrades()">
+                        <i class="fas fa-download"></i>
+                        내보내기
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="positions-table">
+                    <thead>
+                        <tr>
+                            <th>시간</th>
+                            <th>종목</th>
+                            <th>방향</th>
+                            <th>크기</th>
+                            <th>진입가</th>
+                            <th>종료가</th>
+                            <th>손익 ($)</th>
+                            <th>손익률</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trades-tbody">
+                        <tr>
+                            <td colspan="8" class="text-center" style="color: var(--text-muted); padding: 2rem;">
+                                <i class="fas fa-history" style="font-size: 2rem; opacity: 0.3; margin-bottom: 1rem; display: block;"></i>
+                                최근 거래가 없습니다
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 명령어 팔레트 모달 -->
+    <div id="command-palette" class="command-palette" style="display: none;">
+        <div class="command-palette-content">
+            <div class="command-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="command-input" placeholder="명령어를 입력하세요..." autocomplete="off">
+            </div>
+            <div class="command-list" id="command-list">
+                <!-- 명령어 목록이 동적으로 생성됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 알림 토스트 컨테이너 -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- 확인 모달 -->
+    <div id="confirm-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="confirm-title">확인</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-message"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">취소</button>
+                <button class="btn btn-danger" id="confirm-action">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript ES6 Modules -->
+    <!-- Main script will be loaded at the end -->
+    
+    <!-- Loading Screen -->
+    <div class="loading-screen">
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">
+                <h2>🚀 Bitget Trading System v3.0</h2>
+                <p>대시보드 초기화 중...</p>
+            </div>
+            <div class="loading-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="loading-steps">
+                    <div class="step active">시스템 로드</div>
+                    <div class="step">서비스 연결</div>
+                    <div class="step">컴포넌트 초기화</div>
+                    <div class="step">완료</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Error Boundary -->
+    <div id="error-boundary" class="error-boundary" style="display: none;">
+        <div class="error-content">
+            <h2>⚠️ 오류가 발생했습니다</h2>
+            <p class="error-message"></p>
+            <button class="error-retry">다시 시도</button>
+            <button class="error-reload">새로고침</button>
+        </div>
+    </div>
+
+    <style>
+    /* Loading Screen Styles */
+    .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--bg-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out;
+    }
+
+    .loading-screen.fade-out {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .loading-container {
+        text-align: center;
+        max-width: 400px;
+        padding: 2rem;
+    }
+
+    .loading-spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid var(--border-color);
+        border-top: 4px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 2rem;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .loading-text h2 {
+        color: var(--text-primary);
+        margin: 0 0 0.5rem;
+        font-size: 1.5rem;
+    }
+
+    .loading-text p {
+        color: var(--text-muted);
+        margin: 0 0 2rem;
+    }
+
+    .loading-progress {
+        width: 100%;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 4px;
+        background: var(--border-color);
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: var(--primary-color);
+        width: 0%;
+        animation: progress 3s ease-in-out infinite;
+    }
+
+    @keyframes progress {
+        0% { width: 0%; }
+        50% { width: 70%; }
+        100% { width: 100%; }
+    }
+
+    .loading-steps {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.875rem;
+    }
+
+    .step {
+        color: var(--text-muted);
+        transition: color 0.3s ease;
+    }
+
+    .step.active {
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+
+    /* Toast Styles */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .toast {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem;
+        max-width: 400px;
+        box-shadow: var(--shadow-medium);
+        animation: slideIn 0.3s ease-out;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .toast.success { border-left: 4px solid var(--success-color); }
+    .toast.warning { border-left: 4px solid var(--warning-color); }
+    .toast.error { border-left: 4px solid var(--error-color); }
+    .toast.info { border-left: 4px solid var(--info-color); }
+
+    .toast-icon {
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .toast-content {
+        flex: 1;
+    }
+
+    .toast-message {
+        color: var(--text-primary);
+        font-weight: 500;
+        margin: 0 0 4px;
+    }
+
+    .toast-action {
+        background: transparent;
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .toast-action:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .toast-close {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        transition: background 0.2s ease;
+    }
+
+    .toast-close:hover {
+        background: var(--border-color);
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    /* Error Boundary Styles */
+    .error-boundary {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10001;
+    }
+
+    .error-content {
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 500px;
+        text-align: center;
+        box-shadow: var(--shadow-large);
+    }
+
+    .error-content h2 {
+        color: var(--error-color);
+        margin: 0 0 1rem;
+    }
+
+    .error-message {
+        color: var(--text-primary);
+        margin: 0 0 2rem;
+        line-height: 1.6;
+    }
+
+    .error-retry,
+    .error-reload {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        margin: 0 8px;
+        transition: background 0.2s ease;
+    }
+
+    .error-retry:hover,
+    .error-reload:hover {
+        background: var(--primary-color-dark);
+    }
+
+    .error-reload {
+        background: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    .error-reload:hover {
+        background: var(--text-muted);
+    }
+
+    /* App Loaded State */
+    body:not(.app-loaded) .container {
+        display: none;
+    }
+
+    body.app-loaded .loading-screen {
+        display: none;
+    }
+    </style>
+
+    <!-- 강화된 스크립트 로딩 시스템 -->
+    <script>
+        // ES6 모듈 로드 시도
+        let moduleLoaded = false;
+        let moduleError = null;
+        
+        // 모듈 로드 타임아웃
+        const moduleTimeout = setTimeout(() => {
+            if (!moduleLoaded) {
+                console.error('❌ 모듈 로드 타임아웃');
+                forceShowDashboard('module_timeout');
+            }
+        }, 6000);
+        
+        // 동적 모듈 로드
+        async function loadMainModule() {
+            try {
+                console.log('📦 메인 모듈 로드 시작...');
+                const module = await import('/dashboard/src/main.js');
+                moduleLoaded = true;
+                clearTimeout(moduleTimeout);
+                console.log('✅ 메인 모듈 로드 성공');
+            } catch (error) {
+                moduleError = error;
+                console.error('❌ 메인 모듈 로드 실패:', error);
+                clearTimeout(moduleTimeout);
+                
+                // Fallback 시스템 실행
+                setTimeout(() => {
+                    if (!document.body.classList.contains('app-loaded')) {
+                        forceShowDashboard('module_error');
+                    }
+                }, 1000);
+            }
+        }
+        
+        // ES6 모듈 지원 확인 후 로드
+        if ('noModule' in HTMLScriptElement.prototype) {
+            // ES6 모듈 지원
+            loadMainModule();
+        } else {
+            // ES6 모듈 미지원
+            console.warn('⚠️ ES6 모듈 미지원 브라우저');
+            setTimeout(() => {
+                forceShowDashboard('no_module_support');
+            }, 2000);
+        }
+    </script>
+    
+    <!-- Fallback for browsers that don't support ES6 modules -->
+    <script nomodule>
+        console.warn('⚠️ ES6 모듈 미지원 - Fallback 모드');
+        setTimeout(function() {
+            forceShowDashboard('no_module_support');
+        }, 3000);
+    </script>
+
+    <!-- Global functions for theme and refresh -->
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Update theme text and icon
+            const themeText = document.getElementById('theme-text');
+            const themeIcon = document.getElementById('theme-icon');
+            if (themeText && themeIcon) {
+                themeText.textContent = newTheme === 'dark' ? '다크' : '라이트';
+                themeIcon.className = newTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+            }
+        }
+
+        function refreshData() {
+            // Trigger refresh event
+            if (window.dashboardApp) {
+                window.dashboardApp.handleRefreshAll();
+            } else {
+                location.reload();
+            }
+        }
+
+        // Initialize theme on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        });
+
+        // 강화된 무한로딩 방지 시스템
+        let loadingTimeout;
+        let emergencyTimeout;
+        let scriptLoadFailed = false;
+        
+        // 1차 타임아웃: 5초 후 경고
+        setTimeout(function() {
+            const loadingScreen = document.querySelector('.loading-screen');
+            if (loadingScreen && loadingScreen.style.display !== 'none' && !document.body.classList.contains('app-loaded')) {
+                console.warn('⚠️ 5초 후에도 로딩 중 - 곧 강제 표시됩니다');
+                
+                // 로딩 메시지 업데이트
+                const loadingText = document.querySelector('.loading-text p');
+                if (loadingText) {
+                    loadingText.textContent = '초기화가 지연되고 있습니다...';
+                }
+            }
+        }, 5000);
+        
+        // 2차 타임아웃: 8초 후 강제 표시
+        emergencyTimeout = setTimeout(function() {
+            const loadingScreen = document.querySelector('.loading-screen');
+            if (loadingScreen && !document.body.classList.contains('app-loaded')) {
+                console.log('🚨 Emergency: 8초 타임아웃 - 강제 대시보드 표시');
+                forceShowDashboard('timeout');
+            }
+        }, 8000);
+        
+        // 3차 안전장치: 15초 후 완전 강제 표시
+        setTimeout(function() {
+            if (!document.body.classList.contains('app-loaded')) {
+                console.log('🚨 CRITICAL: 15초 타임아웃 - 완전 강제 표시');
+                forceShowDashboard('critical_timeout');
+            }
+        }, 15000);
+        
+        function forceShowDashboard(reason) {
+            console.log(`🚨 강제 대시보드 표시 - 원인: ${reason}`);
+            
+            try {
+                // 로딩 화면 숨기기
+                const loadingScreen = document.querySelector('.loading-screen');
+                if (loadingScreen) {
+                    loadingScreen.style.display = 'none';
+                }
+                
+                // 컨테이너 보이기
+                const container = document.querySelector('.container');
+                if (container) {
+                    container.style.display = 'block';
+                }
+                
+                // 앱 로드 완료 표시
+                document.body.classList.add('app-loaded');
+                
+                // 에러 상태 표시
+                showEmergencyDashboard(reason);
+                
+                // 타임아웃 정리
+                if (emergencyTimeout) clearTimeout(emergencyTimeout);
+                
+            } catch (error) {
+                console.error('❌ 강제 표시 중 오류:', error);
+                // 최후의 수단: 페이지 리로드
+                setTimeout(() => location.reload(), 1000);
+            }
+        }
+        
+        function showEmergencyDashboard(reason) {
+            const container = document.querySelector('.container');
+            if (!container) return;
+            
+            // 에러 배너 추가
+            const errorBanner = document.createElement('div');
+            errorBanner.id = 'emergency-banner';
+            errorBanner.style.cssText = `
+                background: linear-gradient(135deg, #ff4444, #cc0000);
+                color: white;
+                padding: 1rem;
+                text-align: center;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 10000;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            `;
+            
+            const reasonTexts = {
+                'timeout': '초기화 시간 초과',
+                'critical_timeout': '심각한 로딩 지연',
+                'script_error': '스크립트 로드 실패',
+                'module_error': '모듈 로드 실패'
+            };
+            
+            errorBanner.innerHTML = `
+                <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                    <div>
+                        <strong>⚠️ 긴급 모드:</strong> ${reasonTexts[reason] || reason} - 기본 기능만 사용 가능
+                    </div>
+                    <div style="margin-top: 0.5rem;">
+                        <button onclick="location.reload()" style="background: white; color: #cc0000; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">
+                            🔄 새로고침
+                        </button>
+                        <button onclick="document.getElementById('emergency-banner').style.display='none'" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid white; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">
+                            ✕ 숨기기
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertBefore(errorBanner, document.body.firstChild);
+            
+            // 컨테이너 상단 마진 추가
+            container.style.marginTop = '80px';
+        }
+    </script>
+</body>
+</html>

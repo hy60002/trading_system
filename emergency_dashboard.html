@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>🚀 응급 대시보드</title>
+    <style>
+        body { 
+            font-family: monospace; background: #000; color: #0f0; 
+            padding: 20px; line-height: 1.6;
+        }
+        .box { 
+            border: 1px solid #0f0; padding: 15px; margin: 10px 0; 
+            background: #001100;
+        }
+        .error { color: #f00; }
+        .success { color: #0f0; }
+        .warning { color: #ff0; }
+    </style>
+</head>
+<body>
+    <h1>🚀 BITGET TRADING SYSTEM v3.0 - 응급 대시보드</h1>
+    
+    <div class="box">
+        <h3>시스템 상태</h3>
+        <div id="status">체크 중...</div>
+    </div>
+    
+    <div class="box">
+        <h3>API 테스트</h3>
+        <div id="api-test">테스트 중...</div>
+    </div>
+    
+    <div class="box">
+        <h3>실시간 로그</h3>
+        <div id="logs" style="height: 200px; overflow-y: scroll; border: 1px solid #333; padding: 10px;">
+            로그 로딩 중...
+        </div>
+    </div>
+
+    <script>
+        function log(msg, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const time = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'warning';
+            logsDiv.innerHTML += `<div class="${className}">[${time}] ${msg}</div>`;
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+
+        async function checkSystem() {
+            log('🔍 시스템 체크 시작...');
+            
+            try {
+                const response = await fetch('/');
+                const data = await response.json();
+                document.getElementById('status').innerHTML = `
+                    <span class="success">✅ ${data.message}</span><br>
+                    <span class="success">상태: ${data.status}</span>
+                `;
+                log('✅ 메인 서버 연결 성공', 'success');
+            } catch (error) {
+                document.getElementById('status').innerHTML = `<span class="error">❌ 서버 연결 실패: ${error.message}</span>`;
+                log('❌ 메인 서버 연결 실패: ' + error.message, 'error');
+            }
+
+            // API 테스트
+            const endpoints = ['/api/dashboard', '/balance', '/positions'];
+            let apiResults = '';
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(endpoint);
+                    const data = await response.json();
+                    apiResults += `<span class="success">✅ ${endpoint}: OK</span><br>`;
+                    log(`✅ ${endpoint} API 정상`, 'success');
+                } catch (error) {
+                    apiResults += `<span class="error">❌ ${endpoint}: ${error.message}</span><br>`;
+                    log(`❌ ${endpoint} API 실패: ${error.message}`, 'error');
+                }
+            }
+            
+            document.getElementById('api-test').innerHTML = apiResults;
+        }
+
+        // 5초마다 상태 체크
+        checkSystem();
+        setInterval(checkSystem, 5000);
+        
+        log('🚀 응급 대시보드 시작됨', 'success');
+    </script>
+</body>
+</html>
