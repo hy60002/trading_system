@@ -1,0 +1,53 @@
+# Trading System - Sensitive Data Protection
+# Environment and Configuration
+.env
+.env.*
+*.env
+
+# Database Files
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs and Cache
+*.log
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Models and Training Data
+models/
+*.pkl
+*.h5
+*.model
+
+# Trading Data
+trades/
+data/
+reports/
+backtest_*/
+*_result.*
+trade_*
+
+# API Keys and Secrets (extra protection)
+*key*
+*secret*
+*token*
+config_private.*
+
+# IDE and Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary Files
+*.tmp
+*.temp
+nul
