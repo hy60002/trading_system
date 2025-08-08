@@ -43,6 +43,10 @@ class GPTAnalyzer:
             except Exception as e:
                 self.logger.warning(f"OpenAI 초기화 실패: {e}")
     
+    async def analyze(self, symbol: str, data: Dict) -> Dict:
+        """Engine-compatible analyze method - wrapper for analyze_market"""
+        return await self.analyze_market(symbol, data)
+    
     async def analyze_market(self, symbol: str, data: Dict) -> Dict:
         """Market analysis using GPT"""
         if not self.openai_client:

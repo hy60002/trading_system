@@ -203,18 +203,16 @@ class TradingConfig:
         '4h': 'four_hours'
     })
     
-    # Timeframe Weights by Symbol
+    # Timeframe Weights by Symbol (XRP REMOVED)
     TIMEFRAME_WEIGHTS: Dict[str, Dict[str, float]] = field(default_factory=lambda: {
         "BTCUSDT": {'4h': 0.5, '1h': 0.3, '15m': 0.2},
-        "ETHUSDT": {'1h': 0.5, '30m': 0.3, '15m': 0.2},
-        "XRPUSDT": {'1h': 0.6, '30m': 0.4}
+        "ETHUSDT": {'1h': 0.5, '30m': 0.3, '15m': 0.2}
     })
     
     # Trading Limits
     DAILY_TRADE_LIMITS: Dict[str, Dict[str, int]] = field(default_factory=lambda: {
         "BTCUSDT": {"max_trades": 10, "max_loss_trades": 3, "cooldown_minutes": 30},
-        "ETHUSDT": {"max_trades": 3, "max_loss_trades": 1, "cooldown_minutes": 120},
-        "XRPUSDT": {"max_trades": 2, "max_loss_trades": 1, "cooldown_minutes": 240}
+        "ETHUSDT": {"max_trades": 3, "max_loss_trades": 1, "cooldown_minutes": 120}
     })
     
     # Fee Configuration

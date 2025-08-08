@@ -11,18 +11,20 @@ from typing import Dict
 # Import handling for both direct and package imports
 try:
     from ..config.config import TradingConfig
+    from .base_strategy import BaseTradingStrategy, TrendFollowingMixin, MomentumMixin, VolumeMixin
 except ImportError:
     import sys
     import os
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     from config.config import TradingConfig
+    from strategies.base_strategy import BaseTradingStrategy, TrendFollowingMixin, MomentumMixin, VolumeMixin
 
 
-class BTCTradingStrategy:
+class BTCTradingStrategy(BaseTradingStrategy, TrendFollowingMixin, MomentumMixin, VolumeMixin):
     """BTC-specific trading strategy"""
     
     def __init__(self, config: TradingConfig):
-        self.config = config
+        super().__init__(config)
         self.logger = logging.getLogger(__name__)
     
     async def analyze(self, symbol: str, df: pd.DataFrame, indicators: Dict) -> Dict:
@@ -212,3 +214,51 @@ class BTCTradingStrategy:
             confidence *= 0.8
         
         return min(95, max(30, confidence))
+    
+    def generate_signal(self, symbol: str, df: pd.DataFrame, indicators: Dict) -> Dict:
+        """Generate trading signal based on analysis"""
+        try:
+            # Use the analyze method to get the full analysis (sync version for signal generation)
+            import asyncio
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            analysis = loop.run_until_complete(self.analyze(symbol, df, indicators))
+            loop.close()
+            
+            # Convert analysis to trading signal
+            action = 'hold'
+            strength = 0.0
+            
+            if analysis['direction'] == 'long' and analysis['confidence'] >= self.min_confidence:
+                action = 'buy'
+                strength = min(1.0, analysis['score'])
+            elif analysis['direction'] == 'short' and analysis['confidence'] >= self.min_confidence:
+                action = 'sell'
+                strength = min(1.0, abs(analysis['score']))
+            
+            # Calculate stop loss and take profit prices
+            current_price = df['close'].iloc[-1]
+            stop_loss = self.get_stop_loss_price(current_price, analysis['direction'])
+            take_profit = self.get_take_profit_price(current_price, analysis['direction'])
+            
+            return {
+                'action': action,
+                'strength': strength,
+                'stop_loss': stop_loss,
+                'take_profit': take_profit,
+                'confidence': analysis['confidence'],
+                'analysis_components': analysis['components'],
+                'timestamp': pd.Timestamp.now(),
+                'symbol': symbol
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Error generating signal for {symbol}: {e}")
+            return {
+                'action': 'hold',
+                'strength': 0.0,
+                'stop_loss': None,
+                'take_profit': None,
+                'confidence': 0,
+                'error': str(e)
+            }

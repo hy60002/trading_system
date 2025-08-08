@@ -151,7 +151,7 @@
   ✅ 확실히 프로그램 파일에 저장된 사항들:
 
   1. ThemeManager.js (749 lines) - ✅ 완전 구현됨
-    - C:\GPTBITCOIN\trading_system\dashboard\src\utils\ThemeManag     
+    - C:\GPTBITCOIN\2\dashboard\src\utils\ThemeManag     
   er.js
     - 6개 내장 테마 (다크, 라이트, 블루, 그린, 퍼플, 자동)
     - 커스텀 테마 생성/수정/삭제 기능
