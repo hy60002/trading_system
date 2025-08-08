@@ -1,0 +1,593 @@
+/**
+ * 🌍 i18n.css - 완전한 다국어 지원 스타일
+ * 9개 언어 지원, RTL 텍스트 방향, 언어별 폰트, 문화적 UI 적응
+ * 200+ lines - DASHBOARD_IMPROVEMENT_COMPLETE.md 요구사항
+ */
+
+/* ===== 기본 다국어 설정 ===== */
+
+/* RTL (Right-to-Left) 언어 지원 */
+[dir="rtl"] {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] * {
+  text-align: inherit;
+}
+
+/* LTR (Left-to-Right) 언어 기본값 */
+[dir="ltr"] {
+  text-align: left;
+  direction: ltr;
+}
+
+/* ===== 언어별 폰트 설정 ===== */
+
+/* 한국어 */
+.lang-ko,
+[lang="ko"] {
+  font-family: 
+    -apple-system,
+    BlinkMacSystemFont,
+    "Apple SD Gothic Neo",
+    "Malgun Gothic",
+    "맑은 고딕",
+    "Noto Sans KR",
+    "Roboto",
+    sans-serif;
+  line-height: 1.6;
+  word-break: keep-all;
+  word-wrap: break-word;
+}
+
+/* 영어 */
+.lang-en,
+[lang="en"] {
+  font-family: 
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Inter",
+    "Roboto",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  line-height: 1.5;
+}
+
+/* 일본어 */
+.lang-ja,
+[lang="ja"] {
+  font-family: 
+    -apple-system,
+    BlinkMacSystemFont,
+    "Hiragino Kaku Gothic ProN",
+    "Hiragino Sans",
+    "Yu Gothic",
+    "Meiryo",
+    "Noto Sans JP",
+    sans-serif;
+  line-height: 1.7;
+  word-break: keep-all;
+}
+
+/* 중국어 (간체) */
+.lang-zh,
+[lang="zh"],
+[lang="zh-CN"] {
+  font-family: 
+    -apple-system,
+    BlinkMacSystemFont,
+    "PingFang SC",
+    "Microsoft YaHei",
+    "微软雅黑",
+    "Noto Sans SC",
+    "Source Han Sans SC",
+    sans-serif;
+  line-height: 1.6;
+}
+
+/* 독일어 */
+.lang-de,
+[lang="de"] {
+  font-family: 
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Inter",
+    "Roboto",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* 프랑스어 */
+.lang-fr,
+[lang="fr"] {
+  font-family: 
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Inter",
+    "Roboto",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  line-height: 1.5;
+}
+
+/* 스페인어 */
+.lang-es,
+[lang="es"] {
+  font-family: 
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Inter",
+    "Roboto",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  line-height: 1.5;
+}
+
+/* 아랍어 */
+.lang-ar,
+[lang="ar"] {
+  font-family: 
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Tahoma",
+    "Arial Unicode MS",
+    "Noto Sans Arabic",
+    sans-serif;
+  line-height: 1.8;
+  text-align: right;
+  direction: rtl;
+}
+
+/* 러시아어 */
+.lang-ru,
+[lang="ru"] {
+  font-family: 
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Inter",
+    "Roboto",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  line-height: 1.5;
+}
+
+/* ===== RTL 레이아웃 조정 ===== */
+
+/* RTL 언어용 레이아웃 */
+.rtl,
+[dir="rtl"] {
+  text-align: right;
+}
+
+/* RTL 네비게이션 */
+.rtl .nav,
+[dir="rtl"] .nav {
+  flex-direction: row-reverse;
+}
+
+.rtl .nav-item,
+[dir="rtl"] .nav-item {
+  margin-left: 0;
+  margin-right: 1rem;
+}
+
+/* RTL 버튼 그룹 */
+.rtl .btn-group,
+[dir="rtl"] .btn-group {
+  flex-direction: row-reverse;
+}
+
+.rtl .btn-group .btn:first-child,
+[dir="rtl"] .btn-group .btn:first-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+}
+
+.rtl .btn-group .btn:last-child,
+[dir="rtl"] .btn-group .btn:last-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: var(--border-radius);
+  border-bottom-left-radius: var(--border-radius);
+}
+
+/* RTL 드롭다운 */
+.rtl .dropdown-menu,
+[dir="rtl"] .dropdown-menu {
+  left: auto;
+  right: 0;
+}
+
+/* RTL 폼 요소 */
+.rtl .form-group label,
+[dir="rtl"] .form-group label {
+  text-align: right;
+}
+
+.rtl .input-group,
+[dir="rtl"] .input-group {
+  flex-direction: row-reverse;
+}
+
+.rtl .input-group .input-group-text,
+[dir="rtl"] .input-group .input-group-text {
+  border-left: 0;
+  border-right: 1px solid var(--color-border);
+}
+
+/* RTL 체크박스와 라디오 */
+.rtl .form-check,
+[dir="rtl"] .form-check {
+  padding-left: 0;
+  padding-right: 1.25rem;
+}
+
+.rtl .form-check-input,
+[dir="rtl"] .form-check-input {
+  margin-left: 0;
+  margin-right: -1.25rem;
+}
+
+/* RTL 리스트 */
+.rtl ul,
+.rtl ol,
+[dir="rtl"] ul,
+[dir="rtl"] ol {
+  padding-left: 0;
+  padding-right: 2rem;
+}
+
+/* ===== 숫자 및 통화 현지화 ===== */
+
+/* 통화 표시 */
+.currency {
+  font-variant-numeric: tabular-nums;
+}
+
+.currency-symbol {
+  font-weight: 500;
+}
+
+/* 언어별 통화 위치 조정 */
+.lang-ko .currency::before {
+  content: "₩";
+  margin-right: 0.25rem;
+}
+
+.lang-en .currency::before,
+.lang-es .currency::before,
+.lang-fr .currency::before {
+  content: "$";
+  margin-right: 0.1rem;
+}
+
+.lang-ja .currency::before,
+.lang-zh .currency::before {
+  content: "¥";
+  margin-right: 0.1rem;
+}
+
+.lang-de .currency::after,
+.lang-fr .currency-eur::after {
+  content: " €";
+  margin-left: 0.25rem;
+}
+
+.lang-ar .currency::before {
+  content: "ر.س ";
+  margin-right: 0.25rem;
+}
+
+.lang-ru .currency::after {
+  content: " ₽";
+  margin-left: 0.25rem;
+}
+
+/* ===== 날짜 및 시간 현지화 ===== */
+
+/* 날짜 포맷 */
+.date-display {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* 시간 포맷 */
+.time-display {
+  font-variant-numeric: tabular-nums;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+}
+
+/* ===== 아이콘 방향 조정 ===== */
+
+/* RTL 아이콘 뒤집기 */
+.rtl .icon-arrow-left,
+[dir="rtl"] .icon-arrow-left {
+  transform: scaleX(-1);
+}
+
+.rtl .icon-arrow-right,
+[dir="rtl"] .icon-arrow-right {
+  transform: scaleX(-1);
+}
+
+.rtl .icon-chevron-left,
+[dir="rtl"] .icon-chevron-left {
+  transform: scaleX(-1);
+}
+
+.rtl .icon-chevron-right,
+[dir="rtl"] .icon-chevron-right {
+  transform: scaleX(-1);
+}
+
+/* ===== 텍스트 정렬 및 방향 유틸리티 ===== */
+
+/* 언어별 텍스트 정렬 */
+.text-start {
+  text-align: left;
+}
+
+[dir="rtl"] .text-start {
+  text-align: right;
+}
+
+.text-end {
+  text-align: right;
+}
+
+[dir="rtl"] .text-end {
+  text-align: left;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* 강제 방향 지정 */
+.ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+.rtl-force {
+  direction: rtl;
+  text-align: right;
+}
+
+/* ===== 플렉스박스 RTL 지원 ===== */
+
+.flex-start {
+  justify-content: flex-start;
+}
+
+[dir="rtl"] .flex-start {
+  justify-content: flex-end;
+}
+
+.flex-end {
+  justify-content: flex-end;
+}
+
+[dir="rtl"] .flex-end {
+  justify-content: flex-start;
+}
+
+/* ===== 마진 및 패딩 RTL 조정 ===== */
+
+.ms-auto {
+  margin-left: auto;
+}
+
+[dir="rtl"] .ms-auto {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.me-auto {
+  margin-right: auto;
+}
+
+[dir="rtl"] .me-auto {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+/* ===== 언어 선택기 스타일 ===== */
+
+.language-selector {
+  appearance: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  min-width: 120px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23666' d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 12px;
+  padding-right: 32px;
+}
+
+[dir="rtl"] .language-selector {
+  background-position: left 8px center;
+  padding-right: 12px;
+  padding-left: 32px;
+}
+
+.language-selector:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+/* ===== 언어별 특수 스타일링 ===== */
+
+/* 아랍어 특수 처리 */
+.lang-ar h1,
+.lang-ar h2,
+.lang-ar h3,
+.lang-ar h4,
+.lang-ar h5,
+.lang-ar h6 {
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.lang-ar p {
+  margin-bottom: 1.25rem;
+}
+
+/* 일본어 특수 처리 */
+.lang-ja {
+  letter-spacing: 0.02em;
+}
+
+/* 중국어 특수 처리 */
+.lang-zh {
+  letter-spacing: 0.01em;
+}
+
+/* 한국어 특수 처리 */
+.lang-ko {
+  word-spacing: 0.1em;
+}
+
+/* ===== 반응형 다국어 지원 ===== */
+
+@media (max-width: 768px) {
+  
+  /* 모바일에서 언어별 폰트 크기 조정 */
+  .lang-ar {
+    font-size: 16px; /* 아랍어는 모바일에서 조금 더 크게 */
+  }
+  
+  .lang-zh,
+  .lang-ja {
+    font-size: 15px; /* 한자/일본어는 모바일에서 조금 작게 */
+  }
+  
+  /* 모바일 언어 선택기 */
+  .language-selector {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  /* 모바일 RTL 조정 */
+  .rtl .mobile-nav {
+    flex-direction: row-reverse;
+  }
+  
+}
+
+/* ===== 프린트 시 다국어 고려 ===== */
+
+@media print {
+  
+  /* 프린트 시 RTL 언어 조정 */
+  [dir="rtl"] {
+    text-align: right;
+  }
+  
+  /* 언어별 프린트 폰트 */
+  .lang-ko,
+  .lang-ja,
+  .lang-zh {
+    font-family: serif;
+  }
+  
+}
+
+/* ===== 접근성 및 고대비 모드 ===== */
+
+@media (prefers-contrast: high) {
+  
+  .language-selector {
+    border-width: 2px;
+  }
+  
+  /* RTL 언어에서 고대비 모드 */
+  [dir="rtl"] .btn {
+    border-width: 2px;
+  }
+  
+}
+
+/* ===== 다국어 애니메이션 ===== */
+
+/* 언어 전환 애니메이션 */
+.i18n-transition {
+  transition: all 0.3s ease;
+}
+
+.i18n-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RTL 전환 애니메이션 */
+.rtl-transition {
+  transition: direction 0.3s ease;
+}
+
+/* ===== 특수 문자 및 이모지 지원 ===== */
+
+.emoji {
+  font-family: 
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol",
+    "Noto Color Emoji";
+  font-size: 1.2em;
+  vertical-align: baseline;
+}
+
+/* ===== 디버깅 유틸리티 ===== */
+
+/* 개발 시 언어/방향 표시 */
+.debug-i18n::before {
+  content: attr(lang) " | " attr(dir);
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 10px;
+  background: #ff0000;
+  color: #ffffff;
+  padding: 2px 4px;
+  z-index: 9999;
+}
+
+/* 미번역 텍스트 표시 (개발 모드) */
+.untranslated {
+  background: rgba(255, 255, 0, 0.3);
+  border: 1px dashed #ff0000;
+}
+
+console.log('🌍 i18n.css loaded - 9 languages + RTL support + cultural adaptations');
